@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARGON — Reviewer Package v0.1.0</title>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111;
+    --border: #222;
+    --accent: #00ff88;
+    --accent2: #ff3366;
+    --text: #e8e8e8;
+    --muted: #666;
+    --code-bg: #0d0d0d;
+    --tag-green: #00ff88;
+    --tag-yellow: #ffcc00;
+    --tag-red: #ff3366;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .header {
+    background: #000;
+    border-bottom: 1px solid var(--accent);
+    padding: 32px 48px;
+    display: flex;
+    align-items: flex-end;
+    gap: 32px;
+  }
+  .header-logo {
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--accent);
+    letter-spacing: -2px;
+    font-family: monospace;
+    text-transform: uppercase;
+  }
+  .header-meta {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 2;
+  }
+  .header-meta span { color: var(--text); }
+  .nav {
+    background: #0d0d0d;
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px;
+    display: flex;
+    gap: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav a {
+    color: var(--muted);
+    text-decoration: none;
+    padding: 14px 20px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .nav a:hover, .nav a.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 48px; }
+  .section { margin-bottom: 64px; }
+  h2 {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  h3 {
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 12px;
+    font-weight: bold;
+  }
+  p { color: #bbb; margin-bottom: 16px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+  }
+  .card-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .card-title {
+    font-size: 18px;
+    color: var(--text);
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  .card-desc { font-size: 12px; color: var(--muted); }
+  .status-badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: bold;
+  }
+  .status-done { background: rgba(0,255,136,0.1); color: var(--tag-green); border: 1px solid var(--tag-green); }
+  .status-wip  { background: rgba(255,204,0,0.1); color: var(--tag-yellow); border: 1px solid var(--tag-yellow); }
+  .status-stub { background: rgba(255,51,102,0.1); color: var(--tag-red); border: 1px solid var(--tag-red); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #1a1a1a;
+    color: #bbb;
+    vertical-align: top;
+  }
+  td:first-child { color: var(--accent); font-weight: bold; }
+  tr:hover td { background: #111; }
+  code {
+    background: var(--code-bg);
+    color: var(--accent);
+    padding: 2px 6px;
+    font-family: monospace;
+    font-size: 12px;
+    border: 1px solid #1e1e1e;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 20px 24px;
+    overflow-x: auto;
+    font-size: 12px;
+    color: #aaa;
+    line-height: 1.8;
+    margin-bottom: 16px;
+  }
+  .arch-flow {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 32px;
+    font-family: monospace;
+    font-size: 13px;
+    line-height: 2.2;
+    color: #aaa;
+  }
+  .arch-highlight { color: var(--accent); }
+  .arch-arrow { color: var(--muted); }
+  .workflow-step { display: flex; gap: 20px; margin-bottom: 20px; align-items: flex-start; }
+  .workflow-num {
+    width: 28px; height: 28px;
+    background: var(--accent);
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .workflow-content h4 { color: var(--text); margin-bottom: 4px; }
+  .workflow-content p { color: var(--muted); font-size: 12px; margin: 0; }
+  .link-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 24px; }
+  .link-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+  .link-btn:hover { background: var(--accent); color: #000; }
+  .link-btn.secondary { border-color: var(--border); color: var(--muted); }
+  .link-btn.secondary:hover { border-color: var(--text); color: var(--text); background: none; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+  .callout {
+    background: rgba(0,255,136,0.04);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: #aaa;
+  }
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  .tab-btn {
+    padding: 10px 16px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 24px 48px;
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">ARGON</div>
+  <div class="header-meta">
+    REVIEWER PACKAGE<br>
+    Version <span>0.1.0</span> &middot; Build date <span>2026-02-27</span><br>
+    Project <span>deadweight-argon</span> &middot; <span>arg0n.dev</span>
+  </div>
+</div>
+
+<nav class="nav">
+  <a href="#overview" class="active">Overview</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#capabilities">Capabilities</a>
+  <a href="#workflows">Workflows</a>
+  <a href="#api">API</a>
+  <a href="#status">Status</a>
+  <a href="#files">Files</a>
+</nav>
+
+<div class="container">
+
+  <div class="section" id="overview">
+    <h2>Overview</h2>
+    <div class="grid-2">
+      <div>
+        <h3>What It Is</h3>
+        <p>Argon is a browser-based motion analysis and character animation pipeline. Upload reference footage &rarr; Argon extracts skeleton pose and facial expression data &rarr; apply that data to drive a character image in your visual style.</p>
+        <p>The entire pipeline runs serverless GPU in the cloud (Modal.com). The interface lives on Vercel. Collaborators open <code>arg0n.dev</code> &mdash; nothing to install.</p>
+        <p>Designed for animator/designer workflows: non-technical users interact through a React UI, technical users can hit the API directly. CivitAI LoRAs are downloadable and cached server-side for injection into any generation or transfer request.</p>
+      </div>
+      <div>
+        <h3>Three Core Operations</h3>
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-label">01</div>
+          <div class="card-title">Analyze</div>
+          <div class="card-desc">Extract body skeleton (DWPose), 468-point face landmarks (MediaPipe), expression coefficients (16 AUs + PAD vector), and segmentation masks (BiRefNet) from any reference image or video.</div>
+        </div>
+        <div class="card" style="margin-bottom:12px;">
+          <div class="card-label">02</div>
+          <div class="card-title">Transfer</div>
+          <div class="card-desc">Apply extracted motion and expression data to a character still via LivePortrait. Supports single-frame expression transfer and full beat-synced animated sequences.</div>
+        </div>
+        <div class="card">
+          <div class="card-label">03</div>
+          <div class="card-title">Generate</div>
+          <div class="card-desc">Text-to-image and pose-conditioned generation via ComfyUI (SDXL/Flux). CivitAI LoRAs injected at inference time via ComfyUI LoraLoader nodes.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section" id="architecture">
+    <h2>Architecture</h2>
+    <div class="arch-flow">
+      <span class="arch-highlight">arg0n.dev</span> (Vercel &middot; Create React App)<br>
+      &nbsp;&nbsp;|<br>
+      &nbsp;&nbsp;| Vercel rewrite: <code>/api/:path*</code> &rarr; Modal URL<br>
+      &nbsp;&nbsp;|<br>
+      &nbsp;&nbsp;&darr;<br>
+      <span class="arch-highlight">Modal.com</span> (serverless GPU &middot; L4/A10G)<br>
+      &nbsp;&nbsp;+-- <code>ArgonRuntime</code> cls (warm container, 300s idle timeout)<br>
+      &nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;+-- MediaPipe face mesh (init on container start)<br>
+      &nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;+-- ComfyUI (DWPose &middot; LivePortrait &middot; BiRefNet)<br>
+      &nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;+-- CivitAI LoRA downloader &rarr; Modal Volume<br>
+      &nbsp;&nbsp;+-- FastAPI HTTP layer (matches argon-server.js contract)<br>
+      &nbsp;&nbsp;+-- <code>modal.Dict</code> &rarr; cross-request job state<br>
+      &nbsp;&nbsp;+-- <code>modal.Volume</code> &rarr; /models/loras/ persistent LoRA cache
+    </div>
+    <div style="margin-top:24px;">
+      <h3>Key Design Decisions</h3>
+      <div class="grid-2" style="margin-top:16px;">
+        <div class="card">
+          <div class="card-label">No Vercel Serverless Functions</div>
+          <div class="card-desc" style="margin-top:8px;">CRA project &mdash; no built-in API routes. Vercel <code>rewrites</code> proxy all <code>/api/*</code> calls directly to Modal. Zero additional infrastructure.</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Dual-mode: Mock + GPU</div>
+          <div class="card-desc" style="margin-top:8px;">Every endpoint returns valid mock data when ComfyUI models aren't loaded. Frontend dev continues without GPU wait. Data contract identical between mock and real.</div>
+        </div>
+        <div class="card">
+          <div class="card-label">LoRA Persistence</div>
+          <div class="card-desc" style="margin-top:8px;">Modal Volume at <code>/models/loras/</code> persists across deploys and restarts. Download a CivitAI LoRA once &mdash; cached forever for all sessions.</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Stateless API, Stateful Jobs</div>
+          <div class="card-desc" style="margin-top:8px;"><code>modal.Dict</code> shared KV across containers. Long jobs return jobId immediately; clients poll <code>/api/jobs/:id</code>.</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:24px;">
+      <h3>Tech Stack</h3>
+      <table>
+        <tr><th>Layer</th><th>Technology</th><th>Notes</th></tr>
+        <tr><td>Frontend</td><td>React 18, ReactFlow, Framer Motion, Three.js</td><td>CRA &mdash; Vercel</td></tr>
+        <tr><td>API client</td><td>argon-client.js</td><td>Relative /api/* in prod, localhost:7860 in dev</td></tr>
+        <tr><td>GPU backend</td><td>Modal.com (Python)</td><td>FastAPI + modal.asgi_app() &mdash; L4 default</td></tr>
+        <tr><td>Inference</td><td>ComfyUI + custom nodes</td><td>DWPose, LivePortraitKJ, BiRefNet-ZHO</td></tr>
+        <tr><td>Face analysis</td><td>MediaPipe</td><td>468-point face mesh, always available</td></tr>
+        <tr><td>LoRA source</td><td>CivitAI API</td><td>Download by versionId, cache to Modal Volume</td></tr>
+        <tr><td>Job state</td><td>modal.Dict</td><td>Cross-container shared KV</td></tr>
+        <tr><td>Model storage</td><td>modal.Volume</td><td>Persistent /models/ across deploys</td></tr>
+        <tr><td>Local dev</td><td>argon-server.js (Node.js)</td><td>Zero-dep mock on port 7860</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section" id="capabilities">
+    <h2>Capabilities</h2>
+    <h3 style="margin-bottom:16px;">Expression System</h3>
+    <p>Core data primitive: <strong>ExpressionCoefficients</strong> &mdash; 16 continuous 0&ndash;1 values extracted from face analysis, used to drive character animation.</p>
+    <div class="grid-2">
+      <div>
+        <pre>// ExpressionCoefficients
+{
+  jaw, mouthOpen, mouthCornerUp, mouthCornerDown,
+  lipPucker, lipStretch,
+  browInner, browOuter, browFurrow,
+  eyeWide, eyeClose, eyeSquint,
+  cheekRaise, noseFlair, noseWrinkle,
+  intensity,  // overall expression energy
+
+  emotionVector: {
+    valence:   -1.0 to 1.0,  // +/- sentiment
+    arousal:    0.0 to 1.0,  // calm to excited
+    dominance:  0.0 to 1.0,  // passive to dominant
+  },
+
+  emotionClass: {  // softmax
+    neutral, happy, sad, angry,
+    surprised, fearful, disgusted, contempt
+  }
+}</pre>
+      </div>
+      <div>
+        <h3 style="margin-bottom:12px;">Beat Sync</h3>
+        <p style="font-size:12px;">Pass <code>BeatEmotionCurve</code> into sequence transfer &mdash; expression intensity peaks on downbeats.</p>
+        <pre>// BeatEmotionCurve
+{
+  trackDurationMs: 180000,
+  beats: [
+    { timeMs: 0,    strength: 1.0 },
+    { timeMs: 500,  strength: 0.8 },
+    { timeMs: 1000, strength: 1.0 },
+    ...
+  ]
+}</pre>
+        <h3 style="margin-bottom:12px;margin-top:20px;">LoRA Injection</h3>
+        <pre>// any generate/transfer request
+{
+  loraPaths: [
+    "/models/loras/style_12345.safetensors",
+    "/models/loras/face_67890.safetensors"
+  ]
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section" id="workflows">
+    <h2>Theoretical Workflows</h2>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('wf1',this)">Reference Animation</button>
+      <button class="tab-btn" onclick="showTab('wf2',this)">Beat Sync</button>
+      <button class="tab-btn" onclick="showTab('wf3',this)">LoRA Style</button>
+      <button class="tab-btn" onclick="showTab('wf4',this)">Character Sheet</button>
+      <button class="tab-btn" onclick="showTab('wf5',this)">Segmentation</button>
+    </div>
+    <div id="wf1" class="tab-content active">
+      <h3 style="margin-bottom:20px;">Character Animation from Reference Video</h3>
+      <p style="margin-bottom:24px;">Drive a character with a real performer's motion and expression, in your visual style.</p>
+      <div class="workflow-step"><div class="workflow-num">1</div><div class="workflow-content"><h4>Analyze &rarr; Motion</h4><p>Upload reference video. Argon extracts body skeleton + expression per frame. Returns MotionTrack ID.</p></div></div>
+      <div class="workflow-step"><div class="workflow-num">2</div><div class="workflow-content"><h4>Transfer &rarr; Sequence</h4><p>Upload character still. Paste MotionTrack ID. Add optional style prompt + LoRA paths.</p></div></div>
+      <div class="workflow-step"><div class="workflow-num">3</div><div class="workflow-content"><h4>Poll &rarr; Collect Frames</h4><p>Argon renders each frame: DWPose conditioning + LivePortrait expression drive.</p></div></div>
+      <div class="workflow-step"><div class="workflow-num">4</div><div class="workflow-content"><h4>Composite / Export</h4><p>Use frames in your pipeline. Or trigger BiRefNet segmentation for alpha isolation.</p></div></div>
+      <div class="callout">Output: Frame-by-frame animation in your character's style, driven by real human performance.</div>
+    </div>
+    <div id="wf2" class="tab-content">
+      <h3 style="margin-bottom:20px;">Beat-Synced Music Video</h3>
+      <p style="margin-bottom:24px;">Character expressiveness breathes with music &mdash; emotion peaks on downbeats.</p>
+      <div class="workflow-step"><div class="workflow-num">1</div><div class="workflow-content"><h4>Export Beat Timestamps</h4><p>From DAW or BPM tool: array of <code>{ timeMs, strength }</code> per beat.</p></div></div>
+      <div class="workflow-step"><div class="workflow-num">2</div><div class="workflow-content"><h4>Analyze &rarr; Motion</h4><p>Upload reference footage or use mock MotionTrack.</p></div></div>
+      <div class="workflow-step"><div class="workflow-num">3</div><div class="workflow-content"><h4>Transfer &rarr; Sequence with beatCurve</h4><p>Argon multiplies each frame's expression coefficients by proximity-to-beat scalar.</p></div></div>
+      <div class="callout">Output: Expression energy synced to music rhythm &mdash; performance energy, not lipsynch.</div>
+    </div>
+    <div id="wf3" class="tab-content">
+      <h3 style="margin-bottom:20px;">CivitAI Style Injection</h3>
+      <p style="margin-bottom:24px;">Generate frames in any visual style. Download once, cached forever.</p>
+      <div class="workflow-step"><div class="workflow-num">1</div><div class="workflow-content"><h4>Find LoRA on CivitAI</h4><p>Grab versionId from model URL: <code>civitai.com/models/XXXX?modelVersionId=YYYYY</code></p></div></div>
+      <div class="workflow-step"><div class="workflow-num">2</div><div class="workflow-content"><h4>POST /api/loras/download</h4><p>Pass <code>{ versionId }</code>. Downloads, caches to Modal Volume. ~30 seconds. Returns file path.</p></div></div>
+      <div class="workflow-step"><div class="workflow-num">3</div><div class="workflow-content"><h4>Use in Generate or Transfer</h4><p>Pass path as <code>loraPaths: [path]</code>. ComfyUI LoraLoader injects at inference time.</p></div></div>
+      <div class="callout">LoRA library builds up over time on Modal Volume &mdash; shared across all team sessions.</div>
+    </div>
+    <div id="wf4" class="tab-content">
+      <h3 style="margin-bottom:20px;">Character Sheet Generation</h3>
+      <p style="margin-bottom:24px;">Consistent identity across all pose angles.</p>
+      <div class="workflow-step"><div class="workflow-num">1</div><div class="workflow-content"><h4>Analyze &rarr; Face</h4><p>Upload reference portrait. Returns <code>identityHash</code> string.</p></div></div>
+      <div class="workflow-step"><div class="workflow-num">2</div><div class="workflow-content"><h4>Generate &rarr; Pose (FRONT)</h4><p>Character prompt + LoRAs + <code>identityLock: hash</code>.</p></div></div>
+      <div class="workflow-step"><div class="workflow-num">3</div><div class="workflow-content"><h4>Repeat Each Angle</h4><p>THREE_QUARTER, SIDE, BACK &mdash; same <code>identityLock</code> hash.</p></div></div>
+      <div class="callout">Output: Front / 3/4 / side / back with consistent character identity.</div>
+    </div>
+    <div id="wf5" class="tab-content">
+      <h3 style="margin-bottom:20px;">Segmentation for Compositing</h3>
+      <p style="margin-bottom:24px;">Clean alpha masks for compositing pipelines.</p>
+      <div class="workflow-step"><div class="workflow-num">1</div><div class="workflow-content"><h4>Analyze &rarr; Segment</h4><p>Upload image. Select region: <code>face</code>, <code>hair</code>, <code>body</code>, or <code>full</code>.</p></div></div>
+      <div class="workflow-step"><div class="workflow-num">2</div><div class="workflow-content"><h4>Receive Mask</h4><p>BiRefNet returns base64 PNG alpha mask. Works on photo-real and illustrated styles.</p></div></div>
+      <div class="workflow-step"><div class="workflow-num">3</div><div class="workflow-content"><h4>Composite</h4><p>Use in After Effects, DaVinci, or any compositing tool.</p></div></div>
+      <div class="callout">BiRefNet is strong on illustration/anime art &mdash; better than roto on non-photorealistic content.</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section" id="api">
+    <h2>API Reference</h2>
+    <p>All endpoints at <code>/api/*</code> &mdash; Vercel rewrites proxy to Modal. Auth-free during dev phase.</p>
+    <table>
+      <tr><th>Method</th><th>Endpoint</th><th>Sync/Async</th><th>Description</th></tr>
+      <tr><td>GET</td><td>/api/health</td><td>sync</td><td>Backend status</td></tr>
+      <tr><td>POST</td><td>/api/analyze/motion</td><td>async</td><td>Extract MotionTrack from video/image &mdash; returns trackId + jobId</td></tr>
+      <tr><td>POST</td><td>/api/analyze/expression</td><td>sync</td><td>16 expression coefficients + emotion vector</td></tr>
+      <tr><td>POST</td><td>/api/analyze/face</td><td>sync</td><td>468 MediaPipe landmarks + ARKit 52 blendshapes</td></tr>
+      <tr><td>POST</td><td>/api/analyze/segment</td><td>sync</td><td>BiRefNet mask for face/hair/body/full</td></tr>
+      <tr><td>POST</td><td>/api/transfer/expression</td><td>sync</td><td>LivePortrait single-frame expression drive</td></tr>
+      <tr><td>POST</td><td>/api/transfer/sequence</td><td>async</td><td>Beat-synced animated sequence with LoRA injection</td></tr>
+      <tr><td>POST</td><td>/api/generate/image</td><td>async</td><td>Text-to-image via ComfyUI (SDXL/Flux) + LoRA</td></tr>
+      <tr><td>POST</td><td>/api/generate/pose</td><td>async</td><td>Pose-conditioned character generation</td></tr>
+      <tr><td>POST</td><td>/api/loras/download</td><td>sync</td><td>Download CivitAI LoRA by versionId to Volume</td></tr>
+      <tr><td>GET</td><td>/api/loras</td><td>sync</td><td>List cached LoRAs</td></tr>
+      <tr><td>GET</td><td>/api/jobs/:jobId</td><td>sync</td><td>Poll job: queued / running / done / error</td></tr>
+      <tr><td>GET</td><td>/api/events</td><td>SSE</td><td>Real-time job updates</td></tr>
+    </table>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section" id="status">
+    <h2>Build Status</h2>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-label">Infrastructure</div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">Modal GPU routing</span></div>
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">Vercel rewrite proxy</span></div>
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">Modal Volume (LoRA cache)</span></div>
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">modal.Dict job state</span></div>
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">SSE event stream</span></div>
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">Async job polling</span></div>
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">argon-client.js</span></div>
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">CivitAI LoRA download</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label">Analysis Models</div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">MediaPipe face mesh</span></div>
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">Expression extraction (16 AUs)</span></div>
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">PAD emotion vector</span></div>
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">Mock MotionTrack (dev)</span></div>
+          <div><span class="status-badge status-stub">STUB</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">DWPose body skeleton</span></div>
+          <div><span class="status-badge status-stub">STUB</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">BiRefNet segmentation</span></div>
+          <div><span class="status-badge status-stub">STUB</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">ARKit blendshapes (full)</span></div>
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">Beat proximity modulation</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label">Generation / Transfer</div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
+          <div><span class="status-badge status-stub">STUB</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">LivePortrait drive</span></div>
+          <div><span class="status-badge status-stub">STUB</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">ComfyUI image gen</span></div>
+          <div><span class="status-badge status-stub">STUB</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">Pose-conditioned gen</span></div>
+          <div><span class="status-badge status-stub">STUB</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">Sequence rendering</span></div>
+          <div><span class="status-badge status-wip">WIP</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">React UI</span></div>
+          <div style="margin-top:16px;font-size:11px;color:#555;">STUB = infra wired,<br>ComfyUI workflow JSON needed.<br>All stubs return valid mock shapes.</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:24px;">
+      <div class="callout">
+        <strong>Next phase:</strong> ComfyUI workflow JSON files for DWPose extraction, LivePortrait expression drive, and SDXL generation with LoraLoader nodes. API surface, data contracts, job system, and GPU routing are all production-ready &mdash; waiting on ComfyUI workflows to replace the stubs.
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section" id="files">
+    <h2>Repository</h2>
+    <p><strong>GitHub:</strong> <code>ChopperD00/deadweight-argon</code> &middot; branch: <code>main</code></p>
+    <table style="margin-top:16px;">
+      <tr><th>File</th><th>Purpose</th><th>Lines</th></tr>
+      <tr><td>modal_server.py</td><td>Modal GPU backend. FastAPI + ArgonRuntime class + all endpoints.</td><td>~400</td></tr>
+      <tr><td>argon-server.js</td><td>Zero-dep Node.js mock server for local dev. Mirrors modal_server.py API exactly.</td><td>~700</td></tr>
+      <tr><td>src/lib/argon-client.js</td><td>React API client. Env-aware, full interface for all endpoints + SSE + polling.</td><td>~250</td></tr>
+      <tr><td>vercel.json</td><td>CRA build config + /api/* rewrite to Modal URL.</td><td>~20</td></tr>
+      <tr><td>.env.example</td><td>All required env vars documented.</td><td>~20</td></tr>
+      <tr><td>DEPLOYMENT.md</td><td>Step-by-step: modal setup &rarr; deploy &rarr; update vercel.json.</td><td>~100</td></tr>
+      <tr><td>USER-GUIDE.md</td><td>Non-technical guide with 6 theoretical workflows + glossary.</td><td>~250</td></tr>
+      <tr><td>ARGON-ANALYSIS-SCHEMA.md</td><td>Full TypeScript interface spec for all data contracts.</td><td>~500</td></tr>
+    </table>
+    <div class="link-row">
+      <a class="link-btn" href="https://github.com/ChopperD00/deadweight-argon" target="_blank">&rarr; GitHub Repo</a>
+      <a class="link-btn" href="https://github.com/ChopperD00/deadweight-argon/blob/main/modal_server.py" target="_blank">modal_server.py</a>
+      <a class="link-btn" href="https://github.com/ChopperD00/deadweight-argon/blob/main/DEPLOYMENT.md" target="_blank">DEPLOYMENT.md</a>
+      <a class="link-btn" href="https://github.com/ChopperD00/deadweight-argon/blob/main/USER-GUIDE.md" target="_blank">USER-GUIDE.md</a>
+      <a class="link-btn" href="https://github.com/ChopperD00/deadweight-argon/blob/main/ARGON-ANALYSIS-SCHEMA.md" target="_blank">SCHEMA.md</a>
+      <a class="link-btn secondary" href="https://arg0n.dev" target="_blank">arg0n.dev &nearr;</a>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <span>ARGON v0.1.0 &middot; Secret Menu / goodlookincorp</span>
+  <span>Reviewer Package &middot; 2026-02-27</span>
+</div>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+const sections = document.querySelectorAll('.section');
+const navLinks = document.querySelectorAll('.nav a');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.id; });
+  navLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+});
+</script>
+</body>
+</html>
