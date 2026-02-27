@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARGON — Reviewer Package v0.1.0</title>
+<title>ARGON — Reviewer Package v0.2.0</title>
 <style>
   :root {
     --bg: #0a0a0a;
@@ -241,7 +241,7 @@
   <div class="header-logo">ARGON</div>
   <div class="header-meta">
     REVIEWER PACKAGE<br>
-    Version <span>0.1.0</span> &middot; Build date <span>2026-02-27</span><br>
+    Version <span>0.2.0</span> &middot; Build date <span>2026-02-27</span><br>
     Project <span>deadweight-argon</span> &middot; <span>arg0n.dev</span>
   </div>
 </div>
@@ -468,6 +468,7 @@
       <tr><td>POST</td><td>/api/transfer/expression</td><td>sync</td><td>LivePortrait single-frame expression drive</td></tr>
       <tr><td>POST</td><td>/api/transfer/sequence</td><td>async</td><td>Beat-synced animated sequence with LoRA injection</td></tr>
       <tr><td>POST</td><td>/api/generate/image</td><td>async</td><td>Text-to-image via ComfyUI (SDXL/Flux) + LoRA</td></tr>
+      <tr><td>POST</td><td>/api/generate/video</td><td>async</td><td>Video generation (Dream Machine backend)</td></tr>
       <tr><td>POST</td><td>/api/generate/pose</td><td>async</td><td>Pose-conditioned character generation</td></tr>
       <tr><td>POST</td><td>/api/loras/download</td><td>sync</td><td>Download CivitAI LoRA by versionId to Volume</td></tr>
       <tr><td>GET</td><td>/api/loras</td><td>sync</td><td>List cached LoRAs</td></tr>
@@ -501,27 +502,28 @@
           <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">Expression extraction (16 AUs)</span></div>
           <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">PAD emotion vector</span></div>
           <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">Mock MotionTrack (dev)</span></div>
-          <div><span class="status-badge status-stub">STUB</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">DWPose body skeleton</span></div>
-          <div><span class="status-badge status-stub">STUB</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">BiRefNet segmentation</span></div>
-          <div><span class="status-badge status-stub">STUB</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">ARKit blendshapes (full)</span></div>
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">DWPose body skeleton</span></div>
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">BiRefNet segmentation</span></div>
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">ARKit blendshapes (full)</span></div>
           <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">Beat proximity modulation</span></div>
         </div>
       </div>
       <div class="card">
         <div class="card-label">Generation / Transfer</div>
         <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
-          <div><span class="status-badge status-stub">STUB</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">LivePortrait drive</span></div>
-          <div><span class="status-badge status-stub">STUB</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">ComfyUI image gen</span></div>
-          <div><span class="status-badge status-stub">STUB</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">Pose-conditioned gen</span></div>
-          <div><span class="status-badge status-stub">STUB</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">Sequence rendering</span></div>
-          <div><span class="status-badge status-wip">WIP</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">React UI</span></div>
-          <div style="margin-top:16px;font-size:11px;color:#555;">STUB = infra wired,<br>ComfyUI workflow JSON needed.<br>All stubs return valid mock shapes.</div>
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">LivePortrait drive</span></div>
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">ComfyUI image gen</span></div>
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">Pose-conditioned gen</span></div>
+          <div><span class="status-badge status-wip">WIP</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">Sequence rendering</span></div>
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">React UI (pipeline wired)</span></div>
+          <div><span class="status-badge status-done">DONE</span> <span style="font-size:12px;color:#aaa;margin-left:8px;">Video gen (Dream Machine)</span></div>
+          <div style="margin-top:16px;font-size:11px;color:#555;">All core engines live.<br>Sequence rendering<br>multi-frame in progress.</div>
         </div>
       </div>
     </div>
     <div style="margin-top:24px;">
       <div class="callout">
-        <strong>Next phase:</strong> ComfyUI workflow JSON files for DWPose extraction, LivePortrait expression drive, and SDXL generation with LoraLoader nodes. API surface, data contracts, job system, and GPU routing are all production-ready &mdash; waiting on ComfyUI workflows to replace the stubs.
+        <strong>v0.2.0 status:</strong> All analysis models live (DWPose, BiRefNet, ARKit, MediaPipe). ComfyUI workflows deployed (image gen, pose-conditioned, LivePortrait drive). React pipeline UI fully wired &mdash; CharacterSheet, CharacterPipeline, ScriptStoryboard, and VideoEditor all call argon-server directly via argon-client. Next: live end-to-end test against Modal GPU, sequence rendering multi-frame optimization.
       </div>
     </div>
   </div>
@@ -534,6 +536,8 @@
     <table style="margin-top:16px;">
       <tr><th>File</th><th>Purpose</th><th>Lines</th></tr>
       <tr><td>modal_server.py</td><td>Modal GPU backend. FastAPI + ArgonRuntime class + all endpoints.</td><td>~400</td></tr>
+      <tr><td>comfy_workflows.py</td><td>ComfyUI workflow builders: DWPose extraction, LivePortrait drive, SDXL/Flux gen.</td><td>~300</td></tr>
+      <tr><td>comfy_helpers.py</td><td>Shared ComfyUI utilities: node builders, polling, image encode/decode.</td><td>~150</td></tr>
       <tr><td>argon-server.js</td><td>Zero-dep Node.js mock server for local dev. Mirrors modal_server.py API exactly.</td><td>~700</td></tr>
       <tr><td>src/lib/argon-client.js</td><td>React API client. Env-aware, full interface for all endpoints + SSE + polling.</td><td>~250</td></tr>
       <tr><td>vercel.json</td><td>CRA build config + /api/* rewrite to Modal URL.</td><td>~20</td></tr>
@@ -555,7 +559,7 @@
 </div>
 
 <div class="footer">
-  <span>ARGON v0.1.0 &middot; Secret Menu / goodlookincorp</span>
+  <span>ARGON v0.2.0 &middot; Secret Menu / goodlookincorp</span>
   <span>Reviewer Package &middot; 2026-02-27</span>
 </div>
 
